@@ -41,12 +41,13 @@
             width: 8px;
             height: 8px;
             background-color: var(--medical-cyan);
+            box-shadow: 0 0 10px var(--medical-cyan);
         }
         #cursor-outline {
             width: 40px;
             height: 40px;
             border: 1px solid rgba(0, 242, 255, 0.5);
-            transition: width 0.2s, height 0.2s;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -65,16 +66,18 @@
             width: 60px;
             height: 60px;
             border-color: var(--server-green);
-            background-color: rgba(10, 255, 10, 0.05);
+            background-color: rgba(10, 255, 10, 0.1);
+            box-shadow: 0 0 15px rgba(10, 255, 10, 0.2);
         }
         body.hovering #cursor-dot {
             background-color: var(--server-green);
+            box-shadow: 0 0 10px var(--server-green);
         }
 
         /* --- VITAL SIGNS OVERLAY --- */
         @keyframes pulse-vignette {
             0% { box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
-            50% { box-shadow: inset 0 0 100px rgba(0, 242, 255, 0.1); } 
+            50% { box-shadow: inset 0 0 120px rgba(0, 242, 255, 0.15); } 
             100% { box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
         }
 
@@ -87,7 +90,7 @@
             pointer-events: none;
             z-index: 5;
             animation: pulse-vignette 4s infinite ease-in-out;
-            background: radial-gradient(circle at center, transparent 0%, transparent 60%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle at center, transparent 0%, transparent 60%, rgba(0,0,0,0.85) 100%);
         }
 
         #canvas-container {
@@ -115,13 +118,14 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
             position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
         /* 3D Tilt Hover Effect for Cards */
         .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            border-color: rgba(0, 242, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            transform: translateY(-5px);
         }
 
         .cyber-border { border-left: 2px solid var(--medical-cyan); }
@@ -160,6 +164,19 @@
         .ai-response p { margin-bottom: 0.5rem; }
         .ai-response code { background: rgba(255,255,255,0.1); padding: 2px 4px; rounded: 2px; color: var(--server-green); }
 
+        /* Protocol Button Styles */
+        .protocol-btn {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            color: #00f2ff;
+            transition: all 0.3s;
+        }
+        .protocol-btn:hover, .protocol-btn.active {
+            background: rgba(0, 242, 255, 0.2);
+            border-color: #00f2ff;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+        
     </style>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-black">
@@ -178,7 +195,7 @@
     <nav class="fixed w-full z-50 px-6 py-4 flex justify-between items-center glass-panel border-b-0 rounded-b-xl mx-auto max-w-7xl left-0 right-0 top-0 mt-2">
         <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
             <div class="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-            <span>JAI <span class="text-cyan-400">PRAKASH</span> .M.D </span>
+            <span>JAI <span class="text-cyan-400">PRAKASH</span> .M.D.</span>
         </div>
         <div class="hidden md:flex gap-6 mono text-xs text-gray-300">
             <a href="#home" class="nav-link hover:text-white transition cursor-pointer">HOME</a>
@@ -393,31 +410,52 @@
             
             <div class="max-w-4xl mx-auto relative z-10">
                 <div class="text-center mb-10 section-fade">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-4">AI_CONSULT<span class="text-cyan-400 animate-pulse">_TERMINAL</span></h2>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">AI_NEXUS<span class="text-cyan-400 animate-pulse">_TERMINAL</span></h2>
                     <p class="text-sm text-gray-500 mt-2 max-w-lg mx-auto">
-                        Interact with Dr. Jai's digital twin. Ask a medical question to get a tech analogy, or a tech question to get a medical analogy.
+                        Powered by Gemini 2.5. Select a protocol to initiate specific diagnostic functions.
                     </p>
+                </div>
+                
+                <!-- Protocol Selection Buttons -->
+                <div class="flex flex-wrap justify-center gap-4 mb-6 section-fade">
+                    <button onclick="setProtocol('biopsy')" id="btn-biopsy" class="protocol-btn px-4 py-2 rounded-full mono text-xs flex items-center gap-2">
+                        <span>✨ CODE_BIOPSY</span>
+                    </button>
+                    <button onclick="setProtocol('translate')" id="btn-translate" class="protocol-btn px-4 py-2 rounded-full mono text-xs flex items-center gap-2">
+                        <span>✨ MED_SYS_TRANSLATOR</span>
+                    </button>
+                    <button onclick="setProtocol('triage')" id="btn-triage" class="protocol-btn px-4 py-2 rounded-full mono text-xs flex items-center gap-2">
+                        <span>✨ NETWORK_TRIAGE</span>
+                    </button>
+                    <button onclick="setProtocol('idea')" id="btn-idea" class="protocol-btn px-4 py-2 rounded-full mono text-xs flex items-center gap-2 text-yellow-400 border-yellow-900/50 hover:bg-yellow-900/20">
+                        <span>✨ HYBRID_IDEATOR</span>
+                    </button>
+                    <button onclick="setProtocol('career')" id="btn-career" class="protocol-btn px-4 py-2 rounded-full mono text-xs flex items-center gap-2 text-pink-400 border-pink-900/50 hover:bg-pink-900/20">
+                        <span>✨ CAREER_PATHWAY</span>
+                    </button>
+                    <button onclick="setProtocol('chat')" id="btn-chat" class="protocol-btn active px-4 py-2 rounded-full mono text-xs flex items-center gap-2">
+                        <span>FREE_CHAT</span>
+                    </button>
                 </div>
 
                 <!-- Terminal Interface -->
-                <div class="glass-panel rounded-lg overflow-hidden border border-gray-700 shadow-2xl section-fade" style="min-height: 400px; display: flex; flex-direction: column;">
+                <div class="glass-panel rounded-lg overflow-hidden border border-gray-700 shadow-2xl section-fade" style="min-height: 450px; display: flex; flex-direction: column;">
                     <div class="bg-gray-900/90 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
                         <div class="flex gap-2">
                             <div class="w-3 h-3 rounded-full bg-red-500"></div>
                             <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                             <div class="w-3 h-3 rounded-full bg-green-500"></div>
                         </div>
-                        <div class="mono text-xs text-gray-400">root@jai-prakash:~/neural-link</div>
+                        <div class="mono text-xs text-gray-400" id="terminal-header">root@jai-prakash:~/neural-link</div>
                     </div>
 
                     <div id="terminal-output" class="flex-1 p-6 font-mono text-sm overflow-y-auto space-y-4 max-h-[350px]">
                         <div class="text-gray-400">
-                            > CONNECTING TO ZARA DATACENTER...<br>
-                            > LOADING MEDICAL DATABASE...<br>
-                            > CONNECTION ESTABLISHED.<br>
+                            > SYSTEM INITIALIZED.<br>
+                            > GEMINI API CONNECTED.<br>
+                            > SELECT A PROTOCOL TO BEGIN.<br>
                             <br>
-                            <span class="text-cyan-400">Hello. I am Jai's Neural Assistant.</span><br>
-                            I translate between the worlds of Anatomy and Algorithms.<br>
+                            <span class="text-cyan-400">Ready for input.</span><br>
                         </div>
                     </div>
 
@@ -426,9 +464,9 @@
                             <span class="text-green-500 font-bold mono">❯</span>
                             <input type="text" id="terminal-input" 
                                 class="w-full bg-transparent border-none outline-none text-white font-mono placeholder-gray-600 focus:ring-0"
-                                placeholder="Query the candidate..." autocomplete="off">
+                                placeholder="Type command here..." autocomplete="off">
                             <button id="send-btn" class="text-xs bg-cyan-900/50 hover:bg-cyan-800 text-cyan-300 border border-cyan-700 px-3 py-1 rounded mono transition">
-                                SEND
+                                EXECUTE
                             </button>
                         </div>
                     </div>
@@ -529,7 +567,7 @@
 
         <footer class="text-center py-8 border-t border-gray-900 bg-black/50">
             <div class="text-gray-500 text-xs mono space-y-2">
-                <p>&copy; 2024 JAI PRAKASH .M.D (Candidate) — BUILT WITH CARE</p>
+                <p>&copy; 2025 JAI PRAKASH .M.D (Candidate) — BUILT WITH CARE</p>
                 <p>POWERED BY <a href="https://webistzu.com" class="text-cyan-400 hover:underline">WEBISTZU</a></p>
             </div>
         </footer>
@@ -549,8 +587,7 @@
             cursorDot.style.left = `${posX}px`;
             cursorDot.style.top = `${posY}px`;
 
-            // Outline follows with delay (animation in CSS keyframes isn't needed here, just transform)
-            // Using animate for smooth trailing
+            // Outline follows with delay
             cursorOutline.animate({
                 left: `${posX}px`,
                 top: `${posY}px`
@@ -567,7 +604,8 @@
         const container = document.getElementById('canvas-container');
         
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.035);
+        // Darker fog for more depth
+        scene.fog = new THREE.FogExp2(0x000000, 0.02);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -576,109 +614,129 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // --- DNA STRUCTURE ---
+        // --- LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        // Orbiting Lights (Blue and Green)
+        const light1 = new THREE.PointLight(0x00f2ff, 2, 50); // Cyan
+        scene.add(light1);
+        
+        const light2 = new THREE.PointLight(0x0aff0a, 2, 50); // Green
+        scene.add(light2);
+
+        // --- DNA STRUCTURE (Luminous Crystal V3) ---
         const dnaGroup = new THREE.Group();
         scene.add(dnaGroup);
 
-        const nucleotideCount = 140; // Increased density for longer helix
-        const radius = 1.2;
-        const height = 20; // Taller DNA
+        const nucleotideCount = 80;
+        const radius = 1.5;
+        const height = 15; 
         const heightStep = height / nucleotideCount;
 
-        // --- TECH MATERIALS ---
-        const backboneMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.5 }); 
-        const backboneNodeMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff }); 
-        const baseAMat = new THREE.MeshBasicMaterial({ color: 0x0aff0a }); // Green Data
-        const baseTMat = new THREE.MeshBasicMaterial({ color: 0xff0055 }); // Red Data
+        // --- MATERIALS ---
+        // Crystal Material for Backbone
+        const backboneMat = new THREE.MeshPhongMaterial({ 
+            color: 0x00f2ff, 
+            emissive: 0x001133,
+            specular: 0xffffff,
+            shininess: 100,
+            transparent: true, 
+            opacity: 0.8,
+            flatShading: true 
+        }); 
 
-        // Reusable Geometries for Performance
-        const backboneGeo = new THREE.IcosahedronGeometry(0.12, 0); 
-        const cageGeo = new THREE.IcosahedronGeometry(0.2, 0);
+        // Glowing Materials for Base Pairs
+        const baseAMat = new THREE.MeshPhongMaterial({ 
+            color: 0x0aff0a, 
+            emissive: 0x003300,
+            transparent: true,
+            opacity: 0.9
+        }); 
+        
+        const baseTMat = new THREE.MeshPhongMaterial({ 
+            color: 0xff0055, 
+            emissive: 0x330011,
+            transparent: true,
+            opacity: 0.9
+        });
 
-        // Store references to animate them later
+        // Geometries
+        const crystalGeo = new THREE.OctahedronGeometry(0.15, 0); // Sharp crystals
+        
         const dnaBasePairs = [];
 
         for (let i = 0; i < nucleotideCount; i++) {
-            const t = i * 0.25; 
+            const t = i * 0.3; 
             const y = (i * heightStep) - (height / 2);
 
             // Strand 1
             const x1 = Math.cos(t) * radius;
             const z1 = Math.sin(t) * radius;
             
-            // Strand 2 (180 degree offset for tech look symmetry)
+            // Strand 2
             const x2 = Math.cos(t + Math.PI) * radius;
             const z2 = Math.sin(t + Math.PI) * radius;
 
-            // 1. Backbone Nodes (Solid Core)
-            const b1 = new THREE.Mesh(backboneGeo, backboneNodeMat);
+            // 1. Crystal Backbone Nodes
+            const b1 = new THREE.Mesh(crystalGeo, backboneMat);
             b1.position.set(x1, y, z1);
+            b1.rotation.set(Math.random(), Math.random(), Math.random());
             dnaGroup.add(b1);
 
-            const b2 = new THREE.Mesh(backboneGeo, backboneNodeMat);
+            const b2 = new THREE.Mesh(crystalGeo, backboneMat);
             b2.position.set(x2, y, z2);
+            b2.rotation.set(Math.random(), Math.random(), Math.random());
             dnaGroup.add(b2);
 
-            // 2. Backbone Cage (Rotating Wireframe)
-            const cage1 = new THREE.Mesh(cageGeo, backboneMat);
-            cage1.position.copy(b1.position);
-            cage1.rotation.set(Math.random(), Math.random(), 0);
-            cage1.userData = { rotationSpeed: Math.random() * 0.02 + 0.01 }; // Custom rotation speed
-            dnaGroup.add(cage1);
-
-            const cage2 = new THREE.Mesh(cageGeo, backboneMat);
-            cage2.position.copy(b2.position);
-            cage2.rotation.set(Math.random(), Math.random(), 0);
-            cage2.userData = { rotationSpeed: Math.random() * 0.02 + 0.01 };
-            dnaGroup.add(cage2);
-
-            // 3. Base Pair (Rectangular Data Blocks)
+            // 2. Glowing Rods (Base Pairs)
             const dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2));
-            const barGeo = new THREE.BoxGeometry(0.06, 0.06, dist);
+            const barGeo = new THREE.CylinderGeometry(0.04, 0.04, dist, 6);
             
-            // Alternate colors for A-T / G-C look
             const isAT = i % 2 === 0; 
             const barMat = isAT ? baseAMat : baseTMat;
 
             const bar = new THREE.Mesh(barGeo, barMat);
             bar.position.set(0, y, 0);
-            bar.rotation.y = -t; // Rotate to match helix angle
+            bar.rotation.z = Math.PI / 2;
+            bar.rotation.y = -t; 
             dnaGroup.add(bar);
 
-            // Add to array for animation
             dnaBasePairs.push(bar);
+            
+            // Add custom animation data to crystals
+            b1.userData = { speed: Math.random() * 0.02 + 0.01 };
+            b2.userData = { speed: Math.random() * 0.02 + 0.01 };
         }
 
-        // Tilt the whole DNA group
+        // Tilt DNA
         dnaGroup.rotation.z = Math.PI / 4; 
         dnaGroup.rotation.x = Math.PI / 6;
 
-
-        // --- PARTICLES ---
+        // --- ATMOSPHERIC PARTICLES ---
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1500;
+        const particlesCount = 2000;
         const posArray = new Float32Array(particlesCount * 3);
-        const colorsArray = new Float32Array(particlesCount * 3);
+        const sizesArray = new Float32Array(particlesCount); // For size variation
 
         for(let i = 0; i < particlesCount * 3; i+=3) {
-            posArray[i] = (Math.random() - 0.5) * 40; 
-            posArray[i+1] = (Math.random() - 0.5) * 40;
-            posArray[i+2] = (Math.random() - 0.5) * 40;
-
-            const color = new THREE.Color(Math.random() > 0.5 ? 0x00f2ff : 0x0aff0a);
-            colorsArray[i] = color.r;
-            colorsArray[i+1] = color.g;
-            colorsArray[i+2] = color.b;
+            posArray[i] = (Math.random() - 0.5) * 50; 
+            posArray[i+1] = (Math.random() - 0.5) * 50;
+            posArray[i+2] = (Math.random() - 0.5) * 50;
+            
+            // Random sizes for depth of field effect
+            sizesArray[i/3] = Math.random() * 0.05 + 0.01;
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.05,
-            vertexColors: true,
+            color: 0xffffff,
+            size: 0.05, // Base size, modified by attribute if using custom shader, but standard material uses uniform size. 
+            // Let's stick to standard for compatibility, but use transparency for depth.
             transparent: true,
-            opacity: 0.6,
+            opacity: 0.4,
             blending: THREE.AdditiveBlending
         });
 
@@ -711,33 +769,35 @@
             targetY = mouseY * 0.001;
 
             // 1. Rotate DNA Helix
-            dnaGroup.rotation.y += 0.005; 
+            dnaGroup.rotation.y += 0.003; 
             
-            // 2. Animate Base Pairs (Data Pulse)
+            // 2. Animate Lights Orbiting DNA
+            light1.position.x = Math.sin(elapsedTime * 0.5) * 6;
+            light1.position.z = Math.cos(elapsedTime * 0.5) * 6;
+            light1.position.y = Math.sin(elapsedTime * 0.2) * 2;
+
+            light2.position.x = Math.sin(elapsedTime * 0.5 + Math.PI) * 6;
+            light2.position.z = Math.cos(elapsedTime * 0.5 + Math.PI) * 6;
+            light2.position.y = Math.cos(elapsedTime * 0.2) * 2;
+
+            // 3. Pulse Base Pairs
             dnaBasePairs.forEach((bar, index) => {
-                // Create a wave moving up the DNA
-                const wave = Math.sin(elapsedTime * 3 + index * 0.2);
-                // Scale width based on wave
-                const scale = 1 + wave * 0.5;
-                bar.scale.set(scale, 1, 1);
+                const wave = Math.sin(elapsedTime * 2 + index * 0.1);
+                // Glow effect simulation via scale
+                const scale = 1 + wave * 0.2;
+                bar.scale.set(scale, 1, scale);
             });
 
-            // 3. Animate Backbone Cages (Local Rotation)
+            // 4. Rotate Crystals independently
             dnaGroup.children.forEach(child => {
-                if (child.geometry.type === 'IcosahedronGeometry' && child.userData.rotationSpeed) {
-                    child.rotation.x += child.userData.rotationSpeed;
-                    child.rotation.y += child.userData.rotationSpeed;
+                if (child.geometry.type === 'OctahedronGeometry') {
+                    child.rotation.x += child.userData.speed;
+                    child.rotation.z += child.userData.speed;
                 }
             });
 
-            // 4. Floating & Breathing
-            dnaGroup.position.y = Math.sin(elapsedTime) * 0.2;
-            const groupScale = 1 + Math.sin(elapsedTime * 0.5) * 0.02;
-            dnaGroup.scale.set(groupScale, groupScale, groupScale);
-
-            // 5. Particles Drift
-            particlesMesh.rotation.y = elapsedTime * 0.02;
-            particlesMesh.rotation.x = mouseY * 0.0001;
+            // 5. Floating
+            dnaGroup.position.y = Math.sin(elapsedTime * 0.5) * 0.5;
 
             // 6. Interactive Parallax
             scene.rotation.y += 0.05 * (targetX - scene.rotation.y);
@@ -770,11 +830,94 @@
 
         document.querySelectorAll('.section-fade').forEach(el => observer.observe(el));
 
-        // --- GEMINI AI LOGIC ---
+        // --- GEMINI AI LOGIC & PROTOCOLS ---
         const terminalOutput = document.getElementById('terminal-output');
         const terminalInput = document.getElementById('terminal-input');
         const sendBtn = document.getElementById('send-btn');
         const apiKey = ""; 
+
+        // State for Protocols
+        let currentProtocol = 'chat'; // default
+
+        // Protocol Definitions (System Prompts)
+        const protocols = {
+            'chat': `You are Jai's Neural Assistant. You are a witty, professional digital twin of an MD Candidate/Server Engineer. Answer generic questions using tech-medical analogies.`,
+            
+            'biopsy': `PROTOCOL: CODE_BIOPSY. You are a "Code Pathologist". 
+             Input: User will provide a code snippet. 
+             Output: 
+             1. "Patient Status": (Critical/Stable)
+             2. "Symptoms": (List bugs or smells)
+             3. "Diagnosis": (Explain the error using medical terms, e.g., "Memory Leak Hemorrhage")
+             4. "Prescription": (Corrected code). 
+             Keep it concise and thematic.`,
+
+            'translate': `PROTOCOL: MED_SYS_TRANSLATOR. 
+             Input: A complex Medical Term or Concept.
+             Output: Explain it purely using Server/DevOps/Networking analogies. 
+             Example: "Mitosis" -> "Container Orchestration Scaling Event". 
+             Make it sound authoritative yet creative.`,
+
+            'triage': `PROTOCOL: NETWORK_TRIAGE.
+             Input: A Server Error Log or Network Issue description.
+             Output: Explain it using Human Anatomy/Physiology analogies.
+             Example: "High Latency" -> "Neurological Delay/Slow Reflexes".
+             Provide a "Treatment Plan" (Fix).`,
+
+            'idea': `PROTOCOL: HYBRID_IDEATOR.
+             Input: (Optional user keywords or just random generation)
+             Output: Generate a unique, cutting-edge project idea that specifically requires BOTH Medical Knowledge (MBBS) and Advanced Tech (Server/Web).
+             Format:
+             - Project Name: (Cool Tech Name)
+             - Medical Problem: (Real issue)
+             - Tech Solution: (Specific stack e.g., Docker, Kafka, HL7, React)
+             - "The Hybrid Edge": Why this needs a doctor-coder to build.`,
+
+            'career': `PROTOCOL: CAREER_PATHWAY.
+             Input: (Optional user interest or random)
+             Output: Suggest a highly specialized, visionary career role for someone with an MD + Full Stack Engineering background.
+             Examples: "Tele-Surgery Network Architect", "Bio-Informatics Infrastructure Lead".
+             Explain the role and why it's high impact.`
+        };
+
+        function setProtocol(type) {
+            currentProtocol = type;
+            
+            // Update UI buttons
+            document.querySelectorAll('.protocol-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
+            
+            // Terminal Feedback
+            const header = document.getElementById('terminal-header');
+            
+            switch(type) {
+                case 'biopsy': 
+                    header.innerText = "root@jai:~/protocols/code_biopsy";
+                    appendToTerminal("> MODE SWITCHED: CODE BIOPSY. PASTE CODE SNIPPET.", 'system');
+                    break;
+                case 'translate': 
+                    header.innerText = "root@jai:~/protocols/med_translator";
+                    appendToTerminal("> MODE SWITCHED: MED_SYS TRANSLATOR. ENTER MEDICAL TERM.", 'system');
+                    break;
+                case 'triage': 
+                    header.innerText = "root@jai:~/protocols/net_triage";
+                    appendToTerminal("> MODE SWITCHED: NETWORK TRIAGE. PASTE ERROR LOG.", 'system');
+                    break;
+                case 'idea':
+                    header.innerText = "root@jai:~/protocols/hybrid_ideator";
+                    appendToTerminal("> MODE SWITCHED: HYBRID IDEATOR. CLICK EXECUTE TO GENERATE IDEA.", 'system');
+                    break;
+                case 'career':
+                    header.innerText = "root@jai:~/protocols/career_pathway";
+                    appendToTerminal("> MODE SWITCHED: CAREER PATHWAY. CLICK EXECUTE FOR VISION.", 'system');
+                    break;
+                case 'chat': 
+                default:
+                    header.innerText = "root@jai:~/neural-link";
+                    appendToTerminal("> MODE SWITCHED: FREE CHAT.", 'system');
+                    break;
+            }
+        }
 
         function appendToTerminal(text, type = 'user') {
             const div = document.createElement('div');
@@ -786,7 +929,7 @@
                 div.innerHTML = `<span class="text-cyan-400 font-bold">[DR.JAI]:</span> <div class="ai-response text-gray-300 ml-4 border-l border-cyan-900 pl-2 mt-1">${marked.parse(text)}</div>`;
             } else if (type === 'thinking') {
                  div.id = "thinking-indicator";
-                 div.innerHTML = `<span class="text-cyan-400 font-bold">[DR.JAI]:</span> <span class="text-gray-500 animate-pulse terminal-cursor"> Consult Protocol Initiated...</span>`;
+                 div.innerHTML = `<span class="text-cyan-400 font-bold">[DR.JAI]:</span> <span class="text-gray-500 animate-pulse terminal-cursor"> Processing via Protocol ${currentProtocol.toUpperCase()}...</span>`;
             } else if (type === 'error') {
                  div.innerHTML = `<span class="text-red-500 font-bold">[ERR]:</span> <span class="text-gray-500">${text}</span>`;
             }
@@ -797,35 +940,29 @@
         }
 
         async function callGemini(userPrompt) {
-            if (!userPrompt.trim()) return;
+            // Allow empty prompt for generator modes
+            if (!userPrompt.trim() && (currentProtocol !== 'idea' && currentProtocol !== 'career')) return;
+            
+            // For generators, if empty, provide a trigger phrase
+            let finalPrompt = userPrompt;
+            if (!userPrompt.trim()) {
+                if (currentProtocol === 'idea') finalPrompt = "Generate a random hybrid project idea.";
+                if (currentProtocol === 'career') finalPrompt = "Suggest a visionary career path.";
+            }
 
-            appendToTerminal(userPrompt, 'user');
+            appendToTerminal(finalPrompt, 'user');
             terminalInput.value = '';
             
             const thinkingDiv = appendToTerminal('', 'thinking');
 
-            const systemPrompt = `
-            You are the digital twin of Jai Prakash.
-            You are an MD Candidate (not yet a doctor) AND a Server Engineer/Web Developer.
-            
-            Context about Jai:
-            - MD Candidate at SEU (Georgian National University).
-            - Founder of Zara Datacenter & Webistzu.
-            - Tagline: "Precision in medicine, precision in code."
-            - Expert in: Physiology, Embryology, Linux Servers, Full Stack JS.
-            
-            Your Persona:
-            - Professional, slightly witty, high-tech.
-            - Use analogies that mix medicine and tech. (e.g., "Let's run a differential diagnosis on that server log.")
-            - Keep answers short and punchy.
-            `;
+            const systemPrompt = protocols[currentProtocol];
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: userPrompt }] }],
+                        contents: [{ parts: [{ text: finalPrompt }] }],
                         systemInstruction: { parts: [{ text: systemPrompt }] }
                     })
                 });
@@ -851,5 +988,4 @@
 
     </script>
 </body>
-
 </html>
